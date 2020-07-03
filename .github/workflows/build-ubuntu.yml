@@ -3,8 +3,8 @@ name: Build Images
 on:
   push:
     # Build and publish: configure built via commit message
-    branches:
-      - master
+    # branches:
+    #   - master
   pull_request:
     # Build, but don't push on pull requests
 
@@ -121,7 +121,7 @@ jobs:
   push:
     name: Push
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.repository == 'pandoc/dockerfiles'
+    if: github.event_name == 'push' && github.repository == 'tarleb/dockerfiles'
     needs:
       - configure
       - build
@@ -147,12 +147,18 @@ jobs:
             docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
       - name: Push core image
-        run: docker push pandoc/ubuntu:$PANDOC_VERSION
+        run: |
+          docker tag pandoc/ubuntu:$PANDOC_VERSION tarleb/ubuntu:$PANDOC_VERSION
+          docker push tarleb/ubuntu:$PANDOC_VERSION
 
       - name: Push crossref image
         if: env.WITHOUT_CROSSREF == ''
-        run: docker push pandoc/ubuntu-crossref:$PANDOC_VERSION
+        run: |
+          docker tag pandoc/ubuntu-crossref:$PANDOC_VERSION tarleb/ubuntu-crossref:$PANDOC_VERSION
+          docker push tarleb/ubuntu-crossref:$PANDOC_VERSION
 
       - name: Push LaTeX image
         if: env.WITHOUT_CROSSREF == ''
-        run: docker push pandoc/ubuntu-latex:$PANDOC_VERSION
+        run: |
+          docker tag pandoc/ubuntu-latex:$PANDOC_VERSION tarleb/ubuntu-latex:$PANDOC_VERSION
+          docker push tarleb/ubuntu-latex:$PANDOC_VERSION
